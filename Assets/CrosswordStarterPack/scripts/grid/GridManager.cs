@@ -94,6 +94,8 @@ public class GridManager : MonoBehaviour {
 	public Toggle clueTypeToggle;
 	public bool originalClue = true;
 
+	public bool loadPuzzleOption = true;
+
 	public List<GameObject> hintPopupMenuGroup = new List<GameObject>();
 	public List<GameObject> optionsMenuGroup = new List<GameObject>();
 	public List<GameObject> infoMenuGroup = new List<GameObject>();
@@ -136,22 +138,76 @@ public class GridManager : MonoBehaviour {
 			// aPuzzle: puzzleData: BAD:BEAM:WOOSEKE:AWRY:INFOAIL:TEEN:DEFYKNIFE::ADE::::::ASH::UNTIESLID:ALSO:ARTWIN:BLAHS:PICARK:LOGO:MESHBAYOU::PEA::::::REC::ETHICPAID:OVER:EREACRE:MINI:ROELEER:BASE:ONS	
 
 			currentPuzzle = new XMLParser.aPuzzle();
+
+//			currentPuzzle.number = "1";
+//			currentPuzzle.difficulty = "Easy";
+//			currentPuzzle.tag = "Crossword SX_001_01x.txt";
+//			currentPuzzle.title = "Penny Press - Easy";
+//			currentPuzzle.puzzleSize = "13";
+//			currentPuzzle.puzzleCutout = "-";
+//			currentPuzzle.puzzleSolid = ":";
+//			currentPuzzle.puzzleData = "BAD:BEAM:WOOSEKE:AWRY:INFOAIL:TEEN:DEFYKNIFE::ADE::::::ASH::UNTIESLID:ALSO:ARTWIN:BLAHS:PICARK:LOGO:MESHBAYOU::PEA::::::REC::ETHICPAID:OVER:EREACRE:MINI:ROELEER:BASE:ONS";
+
+
 			currentPuzzle.number = "1";
 			currentPuzzle.difficulty = "Easy";
-			currentPuzzle.tag = "Crossword SX_001_01x.txt";
-			currentPuzzle.title = "Penny Press - Easy";
-			currentPuzzle.puzzleSize = "13";
+			//currentPuzzle.tag = "CCAD-crossword.txt";
+			//currentPuzzle.tag = "";
+			//currentPuzzle.tag = "CCAD-crossword2.txt";
+			currentPuzzle.tag = "CCAD-crossword3.txt";
+			currentPuzzle.title = "CCAD - Easy";
+			currentPuzzle.puzzleSize = "8";
 			currentPuzzle.puzzleCutout = "-";
 			currentPuzzle.puzzleSolid = ":";
-			currentPuzzle.puzzleData = "BAD:BEAM:WOOSEKE:AWRY:INFOAIL:TEEN:DEFYKNIFE::ADE::::::ASH::UNTIESLID:ALSO:ARTWIN:BLAHS:PICARK:LOGO:MESHBAYOU::PEA::::::REC::ETHICPAID:OVER:EREACRE:MINI:ROELEER:BASE:ONS";
+			//currentPuzzle.puzzleData = ":n::::::qing wen: i::o:::h::::::ta:::::::o::::::"; // 8x6
+			//currentPuzzle.puzzleData = ":n::::::qing wen: i::o:::h::::::ta:::::::o::::::::::::::::::::::"; // 8x8
+			currentPuzzle.puzzleData = ":N::::::QING WEN: I::O:::H::::::TA:::::::O::::::::::::::::::::::"; // 8x8 - uppercase
+			// crossword puzzle doesn't handle spaces in words?
+			//currentPuzzle.puzzleData = ":n::::::qing-wen:-i::o:::h::::::ta:::::::o::::::::::::::::::::::";
+			//currentPuzzle.puzzleData = ":n::::::qing:wen::i::o:::h::::::ta:::::::o::::::::::::::::::::::";
 
 			XMLParser.clue puzzleClue = new XMLParser.clue();
-			//{"type": "across","number": "1","primary": "Awful","alternate": "Misbehaving"}
 			puzzleClue.type = "across";
-			puzzleClue.number = "1";
-			puzzleClue.primary = "Awful";
-			puzzleClue.alternate = "Misbehaving";
+			puzzleClue.number = "2";
+			puzzleClue.primary = "Excuse me...";
+			puzzleClue.alternate = "may I ask...";
 			currentPuzzle.acrossClues.Add(puzzleClue);
+
+			puzzleClue = new XMLParser.clue();
+			puzzleClue.type = "across";
+			puzzleClue.number = "12"; //"5";
+			puzzleClue.primary = "he";
+			puzzleClue.alternate = "him";
+			currentPuzzle.acrossClues.Add(puzzleClue);
+
+			puzzleClue = new XMLParser.clue();
+			puzzleClue.type = "down";
+			puzzleClue.number = "1"; //"2";
+			puzzleClue.primary = "hello";
+			puzzleClue.alternate = "";
+			currentPuzzle.downClues.Add(puzzleClue);
+
+			puzzleClue = new XMLParser.clue();
+			puzzleClue.type = "down";
+			puzzleClue.number = "3";
+			puzzleClue.primary = "you";
+			puzzleClue.alternate = "";
+			currentPuzzle.downClues.Add(puzzleClue);
+
+			puzzleClue = new XMLParser.clue();
+			puzzleClue.type = "down";
+			puzzleClue.number = "6";
+			puzzleClue.primary = "I";
+			puzzleClue.alternate = "";
+			currentPuzzle.downClues.Add(puzzleClue);
+
+//			XMLParser.clue puzzleClue = new XMLParser.clue();
+//			//{"type": "across","number": "1","primary": "Awful","alternate": "Misbehaving"}
+//			puzzleClue.type = "across";
+//			puzzleClue.number = "1";
+//			puzzleClue.primary = "Awful";
+//			puzzleClue.alternate = "Misbehaving";
+//			currentPuzzle.acrossClues.Add(puzzleClue);
 
 			XMLParser.Instance.puzzleToLoad = 1;
 
@@ -300,17 +356,29 @@ public class GridManager : MonoBehaviour {
 				}
 				_tempProcessedCellComponent.theCornerTriangleObject.gameObject.SetActive(false);
 
-				//load if it was saved
-				if ((PlayerPrefs.GetString (currentPuzzle.tag + " ** " + _tempProcessedCellComponent.gameObject.name) != "" ||
-				    PlayerPrefs.GetString (currentPuzzle.tag + " ** " + _tempProcessedCellComponent.gameObject.name) != null) &&
-				    _tempProcessedCellComponent.defaultValue != currentPuzzle.puzzleSolid)
-				{
-					_tempProcessedCellComponent.inputValue = PlayerPrefs.GetString (currentPuzzle.tag + " ** " + _tempProcessedCellComponent.gameObject.name);
-					_tempProcessedCellComponent.theValueObject.text = _tempProcessedCellComponent.inputValue;
-					_tempProcessedCellComponent.theValueObject.color = penColor;
-					_tempProcessedCellComponent.theBackgroundObject.color = selectedSecondaryAutoLoad;
-					//Debug.Log (_tempProcessedCellComponent.theBackgroundObject.color.ToString());
-				}
+				//load if it was saved - cell position?
+				if (loadPuzzleOption) {
+					if ((PlayerPrefs.GetString (currentPuzzle.tag + " ** " + _tempProcessedCellComponent.gameObject.name) != "" ||
+					    PlayerPrefs.GetString (currentPuzzle.tag + " ** " + _tempProcessedCellComponent.gameObject.name) != null) &&
+					    _tempProcessedCellComponent.defaultValue != currentPuzzle.puzzleSolid)
+					{
+						_tempProcessedCellComponent.inputValue = PlayerPrefs.GetString (currentPuzzle.tag + " ** " + _tempProcessedCellComponent.gameObject.name);
+						_tempProcessedCellComponent.theValueObject.text = _tempProcessedCellComponent.inputValue;
+						_tempProcessedCellComponent.theValueObject.color = penColor;
+						_tempProcessedCellComponent.theBackgroundObject.color = selectedSecondaryAutoLoad;
+						//Debug.Log (_tempProcessedCellComponent.theBackgroundObject.color.ToString());
+					}
+				} else {
+					if (_tempProcessedCellComponent.defaultValue != currentPuzzle.puzzleSolid) 
+					{
+						_tempProcessedCellComponent.inputValue = "";
+						_tempProcessedCellComponent.theValueObject.text = _tempProcessedCellComponent.inputValue;
+						_tempProcessedCellComponent.theValueObject.color = penColor;
+						_tempProcessedCellComponent.theBackgroundObject.color = selectedSecondaryAutoLoad;
+						//Debug.Log (_tempProcessedCellComponent.theBackgroundObject.color.ToString());
+					}
+
+				}			
 			}
 			_tempProcessedCellPosition.x = this.transform.position.x;
 		}
@@ -1117,7 +1185,7 @@ public class GridManager : MonoBehaviour {
 		//Debug.Log ("start the key function");
 		if (selectedCell != null && !selectedCell.isHint)
 		{
-			//Debug.Log ("PASSED!!!!");
+			Debug.Log ("GridManager: OnKeyboardInputValue: PASSED!!!!");
 			int _tempCurrentCellIndexInTheWord = 0;
 
 			selectedCell.inputValue = value;
@@ -1135,13 +1203,13 @@ public class GridManager : MonoBehaviour {
 					if (penFont)
 					{
 						selectedCell.theValueObject.color = penColor;
-						//Debug.Log ("colored as Pen");
+						Debug.Log ("GridManager: OnKeyboardInputValue: colored as Pen");
 					}
 					else
 					{
 						selectedCell.theValueObject.color = pencilColor;
 						selectedCell.isPencil = true;
-						//Debug.Log ("colored as PenCil");
+						Debug.Log ("GridManager: OnKeyboardInputValue: colored as PenCil");
 					}
 
 				}
@@ -1154,13 +1222,13 @@ public class GridManager : MonoBehaviour {
 				if (penFont)
 				{
 					selectedCell.theValueObject.color = penColor;
-					//Debug.Log ("colored as Pen");
+					Debug.Log ("GridManager: OnKeyboardInputValue: colored as Pen");
 				}
 				else
 				{
 					selectedCell.theValueObject.color = pencilColor;
 					selectedCell.isPencil = true;
-					//Debug.Log ("colored as PenCil");
+					Debug.Log ("GridManager: OnKeyboardInputValue: colored as PenCil");
 				}
 			}
 
@@ -1174,12 +1242,12 @@ public class GridManager : MonoBehaviour {
 				}
 			}
 
-			//Debug.Log("if statement");
+			Debug.Log("GridManager: OnKeyboardInputValue: if statement");
 			//check if to move to the next letter in a word, or to move to a whole new word
 			if (_tempCurrentCellIndexInTheWord+1 < int.Parse(currentPuzzle.puzzleSize)){
 				if (_tempCurrentCellIndexInTheWord+1 < selectedWordCells.Count)
 				{
-					//Debug.Log("set the next selection");
+					Debug.Log("GridManager: OnKeyboardInputValue: set the next selection");
 					if (selectedWordCells[_tempCurrentCellIndexInTheWord+1] != null){
 					    selectedCell = selectedWordCells[_tempCurrentCellIndexInTheWord+1];
 						if (selectedCell != null)
@@ -1190,12 +1258,12 @@ public class GridManager : MonoBehaviour {
 				}
 				else
 				{
-					//Debug.Log("Will move next");
+					Debug.Log("GridManager: OnKeyboardInputValue: Will move next");
 					OnMoveToTheNextWord();
 				}
 			}
 		}
-		//Debug.Log("Will look for compilation");
+		Debug.Log("GridManager: OnKeyboardInputValue: Will look for completion");
 		OnCheckForCompletion();
 	}
 

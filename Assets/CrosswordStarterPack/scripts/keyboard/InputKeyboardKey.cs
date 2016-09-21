@@ -14,6 +14,9 @@ public class InputKeyboardKey : MonoBehaviour {
 	void Awake()
 	{
 		keyValue = keyDefault.gameObject.name.Remove(0, 3);
+		if (keyValue == "Space") {
+			keyValue = " ";
+		}
 	}
 	// Use this for initialization
 	void Start () {
