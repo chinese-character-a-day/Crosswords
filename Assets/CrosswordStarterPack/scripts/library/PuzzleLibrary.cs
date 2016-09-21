@@ -80,6 +80,8 @@ public class PuzzleLibrary : MonoBehaviour {
 
 	public void OnBuildtheLibrary()
 	{
+		Debug.Log("PuzzleLibrary: OnBuildtheLibrary");
+
 		GameObject _tempObject;
 		MagazineUnit _processedMagazine;
 		RectTransform _tempRect;
@@ -109,12 +111,14 @@ public class PuzzleLibrary : MonoBehaviour {
 
 	public void OnLoadMagazineContent(int index)
 	{
+		Debug.Log("PuzzleLibrary: OnLoadMagazineContent");
+
 		magazinesPanel.SetActive (false);
-		//Debug.Log("Checking the type of " + gameMagazinesLibrary[index].displayName);
+		Debug.Log("PuzzleLibrary: Checking the type of " + gameMagazinesLibrary[index].displayName);
 
 		if (gameMagazinesLibrary[index].isDeluxe)
 		{
-			//Debug.Log("Loading a Deluxe");
+			Debug.Log("PuzzleLibrary: Loading a Deluxe");
 			deluxePanel.SetActive(true);
 			OnLoadPuzzlesWithinDeluxe(index);
 		}
@@ -122,13 +126,13 @@ public class PuzzleLibrary : MonoBehaviour {
 		{
 			if (gameMagazinesLibrary[index].isStack)
 			{
-				//Debug.Log("Loading a Stack");
+				Debug.Log("PuzzleLibrary: Loading a Stack");
 				stackPanel.SetActive(true);
 				OnLoadMagazinesWithinStack(index);
 			}
 			else
 			{
-				//Debug.Log("Loading a Magazine");
+				Debug.Log("PuzzleLibrary: Loading a Magazine");
 				puzzlesPanel.SetActive(true);
 				OnLoadPuzzlesWithinMagazine(index);
 			}
@@ -137,6 +141,8 @@ public class PuzzleLibrary : MonoBehaviour {
 
 	public void OnLoadLibraryMagazinesList()
 	{
+		Debug.Log("PuzzleLibrary: OnLoadLibraryMagazinesList");
+
 		puzzlesPanel.SetActive(false);
 		stackPanel.SetActive(false);
 		stackContentPanel.SetActive(false);
@@ -148,6 +154,8 @@ public class PuzzleLibrary : MonoBehaviour {
 
 	public void OnLoadStackMagazinesList()
 	{
+		Debug.Log("PuzzleLibrary: OnLoadStackMagazinesList");
+
 		puzzlesPanel.SetActive(false);
 		deluxePanel.SetActive(false);
 		magazinesPanel.SetActive (false);
@@ -159,6 +167,8 @@ public class PuzzleLibrary : MonoBehaviour {
 
 	public void OnClearTheCurrentLoadedMagazine()
 	{
+		Debug.Log("PuzzleLibrary: OnLoadStackMagazinesList");
+
 		for (int c=0; c<CurrentMagazine.Count; c++)
 		{
 			Destroy (CurrentMagazine[c].gameObject);
@@ -170,6 +180,7 @@ public class PuzzleLibrary : MonoBehaviour {
 	// Deluxe
 	public void OnLoadPuzzlesWithinDeluxe(int index)
 	{
+		Debug.Log("PuzzleLibrary: OnLoadPuzzlesWithinDeluxe");
 
 		CurrentMagazine.Clear();
 		XMLParser.Instance.xmlFile = gameMagazinesLibrary[index].dataFile;
@@ -346,6 +357,8 @@ public class PuzzleLibrary : MonoBehaviour {
 
 	public void OnLoadMagazinesWithinStack (int index)
 	{
+		Debug.Log("PuzzleLibrary: OnLoadMagazinesWithinStack");
+
 		GameObject _tempObject;
 		MagazineUnit _processedMagazine;
 		RectTransform _tempRect;
@@ -405,10 +418,10 @@ public class PuzzleLibrary : MonoBehaviour {
 	//
 	public void OnLoadPuzzlesWithinMagazine(int stackIndex, int index)
 	{
-		//Debug.Log ("<color=green> reading puzzles from stack content magazine! </color>");
+		Debug.Log ("<color=green> reading puzzles from stack content magazine! </color>");
 		CurrentMagazine.Clear();
 		XMLParser.Instance.xmlFile = gameMagazinesLibrary[stackIndex].stackContent[index].dataFile;
-		//Debug.Log (XMLParser.Instance.xmlFile.name);
+		Debug.Log (XMLParser.Instance.xmlFile.name);
 		XMLParser.Instance.BreakdownXML();
 
 		stackContentPanel.SetActive(true);
@@ -492,6 +505,8 @@ public class PuzzleLibrary : MonoBehaviour {
 
 	public void OnLoadPuzzlesWithinMagazine(int index)
 	{
+		Debug.Log("PuzzleLibrary: OnLoadPuzzlesWithinMagazine");
+
 		CurrentMagazine.Clear();
 		XMLParser.Instance.xmlFile = gameMagazinesLibrary[index].dataFile;
 		XMLParser.Instance.BreakdownXML();
@@ -571,6 +586,8 @@ public class PuzzleLibrary : MonoBehaviour {
 
 	public void OnLoadHome()
 	{
+		Debug.Log("PuzzleLibrary: OnLoadHome");
+
 		XMLParser.Instance.puzzles.Clear();
 		Application.LoadLevel("home");
 	}

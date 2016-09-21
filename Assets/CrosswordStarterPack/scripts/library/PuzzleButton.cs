@@ -127,9 +127,9 @@ public class PuzzleButton : MonoBehaviour {
 		}
 		else
 		{
-			Debug.Log("will load");
+			Debug.Log("PuzzleButton: will load puzzle: " + puzzleNumber);
 			Application.LoadLevel ("InGame");
-			Debug.Log("load done");
+			Debug.Log("PuzzleButton: load done");
 		}
 	}
 }

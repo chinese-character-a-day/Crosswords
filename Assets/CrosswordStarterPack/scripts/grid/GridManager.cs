@@ -107,6 +107,8 @@ public class GridManager : MonoBehaviour {
 	private string minutesCorrection ;
 	private string hoursCorrection ;
 
+	private int debugLevel = 1;
+
 	public List <SingleCell> selectionHistory = new List<SingleCell>();
 
 	void Awake()
@@ -115,8 +117,47 @@ public class GridManager : MonoBehaviour {
 	}
 	// Use this for initialization
 	void Start () {
-		currentPuzzle = XMLParser.Instance.puzzles[XMLParser.Instance.puzzleToLoad];
-		BuildTheGrid();
+		if (XMLParser.Instance.puzzles.Count > 0) {
+			currentPuzzle = XMLParser.Instance.puzzles[XMLParser.Instance.puzzleToLoad];
+
+			currentPuzzle.print();
+
+			BuildTheGrid();
+		} else {
+			Debug.LogWarning("GridManager: XMLParser has no puzzles!");
+
+			// aPuzzle: number: 1
+			// aPuzzle: difficulty: Easy
+			// aPuzzle: tag: Crossword SX_001_01x.txt
+			// aPuzzle: title: Penny Press - Easy
+			// aPuzzle: puzzleSize: 13
+			// aPuzzle: puzzleCutout: -
+			// aPuzzle: puzzleSolid: :
+			// aPuzzle: puzzleData: BAD:BEAM:WOOSEKE:AWRY:INFOAIL:TEEN:DEFYKNIFE::ADE::::::ASH::UNTIESLID:ALSO:ARTWIN:BLAHS:PICARK:LOGO:MESHBAYOU::PEA::::::REC::ETHICPAID:OVER:EREACRE:MINI:ROELEER:BASE:ONS	
+
+			currentPuzzle = new XMLParser.aPuzzle();
+			currentPuzzle.number = "1";
+			currentPuzzle.difficulty = "Easy";
+			currentPuzzle.tag = "Crossword SX_001_01x.txt";
+			currentPuzzle.title = "Penny Press - Easy";
+			currentPuzzle.puzzleSize = "13";
+			currentPuzzle.puzzleCutout = "-";
+			currentPuzzle.puzzleSolid = ":";
+			currentPuzzle.puzzleData = "BAD:BEAM:WOOSEKE:AWRY:INFOAIL:TEEN:DEFYKNIFE::ADE::::::ASH::UNTIESLID:ALSO:ARTWIN:BLAHS:PICARK:LOGO:MESHBAYOU::PEA::::::REC::ETHICPAID:OVER:EREACRE:MINI:ROELEER:BASE:ONS";
+
+			XMLParser.clue puzzleClue = new XMLParser.clue();
+			//{"type": "across","number": "1","primary": "Awful","alternate": "Misbehaving"}
+			puzzleClue.type = "across";
+			puzzleClue.number = "1";
+			puzzleClue.primary = "Awful";
+			puzzleClue.alternate = "Misbehaving";
+			currentPuzzle.acrossClues.Add(puzzleClue);
+
+			XMLParser.Instance.puzzleToLoad = 1;
+
+			BuildTheGrid();
+		}
+		
 	}
 	
 	// Update is called once per frame
@@ -153,6 +194,8 @@ public class GridManager : MonoBehaviour {
 
 	public void BuildTheGrid()
 	{
+		Debug.Log("GridManager: BuildTheGrid");
+
 		int gridSize = int.Parse(currentPuzzle.puzzleSize);
 		for (int c=0; c<GridCoreInfo.Count; c++)
 		{
@@ -231,6 +274,10 @@ public class GridManager : MonoBehaviour {
 				_tempProcessedCellRect.localPosition = tempPos;
 
 				_tempProcessedCellComponent.defaultValue = currentPuzzle.puzzleData[(gridSize*x)+y].ToString();
+
+				if (debugLevel > 1) Debug.Log("GridManager: BuildTheGrid: x:"+x+" y:"+y+" puzzleData:"+_tempProcessedCellComponent.defaultValue);
+		
+
 #if DEBUG_BUILD
 				if (DebugManager.Instance.isAutoSolveGridOnGeneration)
 				{
@@ -269,19 +316,33 @@ public class GridManager : MonoBehaviour {
 		}
 
 		currentStatistics.puzzleNumer = int.Parse(currentPuzzle.number);
-
-		if (PlayerPrefs.GetInt (XMLParser.Instance.puzzles[XMLParser.Instance.puzzleToLoad].tag) == 1)
-		{
-			OnCheckForCompletion();
-		}
-		else
-		{
-			NumberTheCells();
+		
+		// hack/fix - jwk
+		if (XMLParser.Instance.puzzles.Count > 0) {
+			if (PlayerPrefs.GetInt (XMLParser.Instance.puzzles[XMLParser.Instance.puzzleToLoad].tag) == 1)
+			{
+				OnCheckForCompletion();
+			}
+			else
+			{
+				NumberTheCells();
+			}
+		} else {
+			if (PlayerPrefs.GetInt (currentPuzzle.tag) == 1)
+			{
+				OnCheckForCompletion();
+			}
+			else
+			{
+				NumberTheCells();
+			}
 		}
 	}
 
 	void NumberTheCells()
 	{
+		Debug.Log("GridManager: NumberTheCells");
+
 		if (currentPuzzleCells.Count > 0)
 		{
 			SingleCell _tempProcessedCellComponent;
@@ -401,6 +462,9 @@ public class GridManager : MonoBehaviour {
 
 	void CheckedAndSettAllPuzzlesDataFromXML()
 	{
+		Debug.Log("GridManager: CheckedAndSettAllPuzzlesDataFromXML");
+
+
 		if (FoundPuzzles.Count != 0)
 		{
 			for (int c=0; c<currentPuzzle.acrossClues.Count; c++)
@@ -434,12 +498,18 @@ public class GridManager : MonoBehaviour {
 	//Chek the words status
 	void OnDefineAllWords()
 	{
+
+		Debug.Log("GridManager: OnDefineAllWords");
+
 		currentStatistics.completeWords = 0;
 		currentStatistics.correctWords = 0;
 		currentStatistics.incorrectWords = 0;
 
 		//all cells one by one horizontally
 		List<SingleCell> _tempLettersList = new List<SingleCell>();
+
+		int totalPuzzleSize = (int.Parse(currentPuzzle.puzzleSize))*(int.Parse(currentPuzzle.puzzleSize));
+		Debug.Log("GridManager: OnDefineAllWords: puzzleSize: " + currentPuzzle.puzzleSize + " totalPuzzleSize: " + totalPuzzleSize);
 
 		for (int c=0; c< ((int.Parse(currentPuzzle.puzzleSize))*(int.Parse(currentPuzzle.puzzleSize))); c++)
 		{
@@ -507,8 +577,11 @@ public class GridManager : MonoBehaviour {
 		}
 	}
 
+	// OnDefineAllWords -> CheckWordValidation
 	void CheckWordValidation(List<SingleCell> theWordLettersList)
 	{
+		if (debugLevel > 1) Debug.Log("\t GridManager: CheckWordValidation: " + theWordLettersList.Count);
+
 
 		int correctLetters = 0;
 		int emptyLetters = 0;
@@ -551,6 +624,8 @@ public class GridManager : MonoBehaviour {
 
 	public void OnChangeSelectionType()
 	{
+		Debug.Log("GridManager: OnChangeSelectionType");
+
 		acrossSelecion = acrossSelectionToggle.isOn;
 		if (selectedCell != null)
 		{
@@ -561,6 +636,8 @@ public class GridManager : MonoBehaviour {
 
 	public void OnChangeClueType()
 	{
+		Debug.Log("GridManager: OnChangeClueType");
+
 		originalClue = clueTypeToggle.isOn;
 		if (originalClue == false)
 		{
@@ -573,6 +650,8 @@ public class GridManager : MonoBehaviour {
 
 	public void OnChangeFontType()
 	{
+		Debug.Log("GridManager: OnChangeFontType");
+
 		penFont = penSelectionToggle.isOn;
 		/*for (int c=0; c<currentPuzzleCells.Count; c++)
 		{
@@ -595,6 +674,8 @@ public class GridManager : MonoBehaviour {
 
 	public void OnChnageErrorDisplay()
 	{
+		Debug.Log("GridManager: OnChnageErrorDisplay");
+
 		displayErrorsOff = errorShowToggle.isOn;
 		for (int c=0; c<currentPuzzleCells.Count; c++)
 		{
@@ -637,6 +718,8 @@ public class GridManager : MonoBehaviour {
 	#region Options
 	public void OnOptionsMenuDisplay(bool status)
 	{
+		Debug.Log("GridManager: OnOptionsMenuDisplay");
+
 		for(int c=0; c<optionsMenuGroup.Count; c++)
 		{
 			optionsMenuGroup[c].gameObject.SetActive(status);
@@ -645,6 +728,8 @@ public class GridManager : MonoBehaviour {
 
 	public void OnDisplayInfoScreen(bool status)
 	{
+		Debug.Log("GridManager: OnDisplayInfoScreen");
+
 		for(int c=0; c<infoMenuGroup.Count; c++)
 		{
 			infoMenuGroup[c].gameObject.SetActive(status);
@@ -654,19 +739,21 @@ public class GridManager : MonoBehaviour {
 
 	public void OnDisplaySettingsScreen()
 	{
-
+		Debug.Log("GridManager: OnDisplaySettingsScreen");
 	}
 
 
 	public void OnDisplayUserGuideScreen()
 	{
-		
+		Debug.Log("GridManager: OnDisplayUserGuideScreen");
 	}
 	#endregion
 
 	#region Hint
 	public void OnHintMenuDisplay(bool status)
 	{
+		Debug.Log("GridManager: OnHintMenuDisplay");
+
 		for(int c=0; c<hintPopupMenuGroup.Count; c++)
 		{
 			hintPopupMenuGroup[c].gameObject.SetActive(status);
@@ -675,6 +762,8 @@ public class GridManager : MonoBehaviour {
 
 	public void OnGiveHintLetter()
 	{
+		Debug.Log("GridManager: OnGiveHintLetter");
+
 		if (selectedWordCells.Count != 0)
 		{
 			for (int c=0; c<selectedWordCells.Count; c++)
@@ -698,6 +787,8 @@ public class GridManager : MonoBehaviour {
 
 	public void OnGiveHintWord()
 	{
+		Debug.Log("GridManager: OnGiveHintWord");
+
 		if (selectedWordCells.Count != 0)
 		{
 			for (int c=0; c<selectedWordCells.Count; c++)
@@ -721,6 +812,9 @@ public class GridManager : MonoBehaviour {
 
 	public void OnSetSelectedCell(SingleCell theCell)
 	{
+		Debug.Log("GridManager: OnSetSelectedCell: " + theCell.cellNumeredWith);
+
+
 		lastSelectedWordCells = selectedWordCells;
 
 		DesellectAllCells();
@@ -830,6 +924,8 @@ public class GridManager : MonoBehaviour {
 
 	void DesellectAllCells()
 	{
+		Debug.Log("GridManager: DesellectAllCells");
+
 		for (int c=0; c<currentPuzzleCells.Count; c++)
 		{
 			if (currentPuzzleCells[c].GetComponent<SingleCell>().defaultValue != currentPuzzle.puzzleSolid)
@@ -929,19 +1025,24 @@ public class GridManager : MonoBehaviour {
 		{
 			for (int v=0; v<selectedWordCells.Count; v++)
 			{
-				InputKeyboard.Instance.keyboardInputCells[v].gameObject.SetActive(true);
 
-				InputKeyboard.Instance.keyboardInputCells[v].reflectedCell = selectedWordCells[v];
-
-				InputKeyboard.Instance.keyboardInputCells[v].CellType = selectedWordCells[v].CellType;
-				InputKeyboard.Instance.keyboardInputCells[v].inputValue = selectedWordCells[v].inputValue;
-				InputKeyboard.Instance.keyboardInputCells[v].theValueObject.color = selectedWordCells[v].theValueObject.color;
-				InputKeyboard.Instance.keyboardInputCells[v].defaultValue = selectedWordCells[v].defaultValue;
-
-				InputKeyboard.Instance.keyboardInputCells[v].theBackgroundObject.color = selectedWordCells[v].theBackgroundObject.color;
-				InputKeyboard.Instance.keyboardInputCells[v].theCornerTriangleObject.gameObject.SetActive(selectedWordCells[v].theCornerTriangleObject.gameObject.activeInHierarchy);
-				InputKeyboard.Instance.keyboardInputCells[v].theValueObject.text = selectedWordCells[v].theValueObject.text;
-
+				// hack -jwk
+				if (v < InputKeyboard.Instance.keyboardInputCells.Count) {
+					InputKeyboard.Instance.keyboardInputCells[v].gameObject.SetActive(true);
+	
+					InputKeyboard.Instance.keyboardInputCells[v].reflectedCell = selectedWordCells[v];
+	
+					InputKeyboard.Instance.keyboardInputCells[v].CellType = selectedWordCells[v].CellType;
+					InputKeyboard.Instance.keyboardInputCells[v].inputValue = selectedWordCells[v].inputValue;
+					InputKeyboard.Instance.keyboardInputCells[v].theValueObject.color = selectedWordCells[v].theValueObject.color;
+					InputKeyboard.Instance.keyboardInputCells[v].defaultValue = selectedWordCells[v].defaultValue;
+	
+					InputKeyboard.Instance.keyboardInputCells[v].theBackgroundObject.color = selectedWordCells[v].theBackgroundObject.color;
+					InputKeyboard.Instance.keyboardInputCells[v].theCornerTriangleObject.gameObject.SetActive(selectedWordCells[v].theCornerTriangleObject.gameObject.activeInHierarchy);
+					InputKeyboard.Instance.keyboardInputCells[v].theValueObject.text = selectedWordCells[v].theValueObject.text;
+				} else {
+					Debug.LogWarning("v outside of range of InputKeyboard.Instance.keyboardInputCells " + v);
+				}
 			}
 		}
 		OnUpdateTheClue(false);
@@ -1011,6 +1112,8 @@ public class GridManager : MonoBehaviour {
 
 	public void OnKeyboardInputValue(string value)
 	{
+		Debug.Log("GridManager: OnKeyboardInputValue");
+
 		//Debug.Log ("start the key function");
 		if (selectedCell != null && !selectedCell.isHint)
 		{
@@ -1098,6 +1201,8 @@ public class GridManager : MonoBehaviour {
 
 	public void OnMoveToTheNextWord()
 	{
+		Debug.Log("GridManager: OnMoveToTheNextWord");
+
 		clueTypeToggle.isOn = true;
 
 		InputKeyboard.Instance.clueDisplay.gameObject.GetComponent<Animator>().SetBool("isClue", false);
@@ -1169,6 +1274,8 @@ public class GridManager : MonoBehaviour {
 	//13
 	public void OnMoveToThePreviousWord()
 	{
+		Debug.Log("GridManager: OnMoveToThePreviousWord");
+
 		for (int c=0; c<currentPuzzleCells.Count; c++)
 		{
 			if (selectionHistory.Count-1 >= 0)
@@ -1259,6 +1366,8 @@ public class GridManager : MonoBehaviour {
 
 	public void OnClearButtonPressed()
 	{
+		Debug.Log("GridManager: OnClearButtonPressed");
+
 		if (InputKeyboard.Instance.canPressClearButton)
 		{
 			int _tempCurrentCellIndexInTheWord = 0;
@@ -1302,6 +1411,8 @@ public class GridManager : MonoBehaviour {
 
 	public void OnUpdateStatistics()
 	{
+		Debug.Log("GridManager: OnUpdateStatistics");
+
 		#region Percentage
 		int _tempFilledCells = 0;
 		int _tempAllValidCells = 0;
@@ -1372,6 +1483,8 @@ public class GridManager : MonoBehaviour {
 
 	public void OnCheckForCompletion()
 	{
+		Debug.Log("GridManager: OnCheckForCompletion");
+
 		SingleCell _tempProcessedCell;
 		int foundCells = 0;
 
@@ -1399,11 +1512,15 @@ public class GridManager : MonoBehaviour {
 
 	public void OnComplete()
 	{
+		Debug.Log("GridManager: OnComplete");
+
 		StartCoroutine (DoCompleteSequence());
 	}
 
 	IEnumerator DoCompleteSequence()
 	{
+		Debug.Log("GridManager: DoCompleteSequence");
+
 		PlayerPrefs.SetInt (currentPuzzle.tag, 1);
 		//hide the debug menu if it is not hidden
 		if (DebugManager.Instance.debugMenu.activeInHierarchy)
@@ -1467,6 +1584,8 @@ public class GridManager : MonoBehaviour {
 
 	public void OnGoBackToLibrary()
 	{
+		Debug.Log("GridManager: OnGoBackToLibrary");
+
 		XMLParser.Instance.puzzles.Clear();
 		Application.LoadLevel ("library");
 	}

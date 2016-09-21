@@ -17,6 +17,22 @@ public class XMLParser : MonoBehaviour {
 		public string number;
 		public string primary;
 		public string alternate;
+
+		public void print() {
+//			Debug.Log("clue: type: " + type);
+//			Debug.Log("clue: number: " + number);
+//			Debug.Log("clue: primary: " + primary);
+//			Debug.Log("clue: alternate: " + alternate);
+
+			string mesg = "{";
+			mesg += "\"type\": \""+type+"\",";
+			mesg += "\"number\": \""+number+"\",";
+			mesg += "\"primary\": \""+primary+"\",";
+			mesg += "\"alternate\": \""+alternate+"\"}";
+
+			Debug.Log(mesg);
+
+		}
 	}
 
 	[Serializable]
@@ -33,6 +49,27 @@ public class XMLParser : MonoBehaviour {
 
 		public List<clue> acrossClues = new List<clue>();
 		public List<clue> downClues = new List<clue>();
+
+		public void print() {
+			Debug.Log("aPuzzle: number: " + number);
+			Debug.Log("aPuzzle: difficulty: " + difficulty);
+			Debug.Log("aPuzzle: tag: " + tag);
+			Debug.Log("aPuzzle: title: " + title);
+			Debug.Log("aPuzzle: puzzleSize: " + puzzleSize);
+			Debug.Log("aPuzzle: puzzleCutout: " + puzzleCutout);
+			Debug.Log("aPuzzle: puzzleSolid: " + puzzleSolid);
+			Debug.Log("aPuzzle: puzzleData: " + puzzleData);
+
+			Debug.Log("aPuzzle: acrossClues:");
+			foreach (clue puzzleClue in acrossClues) {
+				puzzleClue.print();
+			}
+
+			Debug.Log("aPuzzle: downClues:");
+			foreach (clue puzzleClue in downClues) {
+				puzzleClue.print();
+			}
+		}
 	}
 
 	public List<aPuzzle> puzzles = new List<aPuzzle>();
@@ -42,6 +79,8 @@ public class XMLParser : MonoBehaviour {
 	public int puzzleToLoad;
 
 	private static bool _created = false ;
+
+	private int debugLevel = 1;
 
 	void Awake ()
 	{
@@ -61,6 +100,8 @@ public class XMLParser : MonoBehaviour {
 	
 	public void BreakdownXML()
 	{
+		Debug.Log("XMLParser: BreakdownXML");
+
 		//xmlFile = (TextAsset)Resources.Load("Sampler", typeof(TextAsset)); //testFile
 
 		XmlDocument xmlDoc = new XmlDocument(); // xmlDoc is the new xml document.
@@ -87,7 +128,7 @@ public class XMLParser : MonoBehaviour {
 				if(puzzleNode.Name == "title")
 				{
 					_tempPuzzle.title = puzzleNode.InnerText;
-					//Debug.Log (puzzleNode.InnerText);
+					Debug.Log("XMLParser: BreakdownXML: puzzleNode: " + puzzleNode.InnerText);
 				}
 				
 				if(puzzleNode.Name == "grid")
@@ -101,6 +142,8 @@ public class XMLParser : MonoBehaviour {
 					//Debug.Log (puzzleNode.Attributes["cutout"].Value);
 					//Debug.Log (puzzleNode.Attributes["solid"].Value);
 					//Debug.Log (puzzleNode.InnerText);
+
+					Debug.Log ("XMLParser: BreakdownXML: puzzleData: " + _tempPuzzle.puzzleData);
 				}
 				
 				if(puzzleNode.Name == "across")
@@ -112,7 +155,7 @@ public class XMLParser : MonoBehaviour {
 						_tempClue.type = "across";
 						_tempClue.number = clue.Attributes["number"].Value;
 
-						//Debug.Log ("The across Clue number [" + clue.Attributes["number"].Value + "]");
+						if (debugLevel > 1) Debug.Log ("XMLParser: BreakdownXML: The across Clue number [" + clue.Attributes["number"].Value + "]");
 
 						XmlNodeList clueTypes = clue.ChildNodes;
 						foreach (XmlNode clueType in clueTypes)
@@ -142,7 +185,7 @@ public class XMLParser : MonoBehaviour {
 						_tempClue.type = "down";
 						_tempClue.number = clue.Attributes["number"].Value;
 						
-						//Debug.Log ("The across Clue number [" + clue.Attributes["number"].Value + "]");
+						if (debugLevel > 1) Debug.Log ("XMLParser: BreakdownXML: The down Clue number [" + clue.Attributes["number"].Value + "]");
 						
 						XmlNodeList clueTypes = clue.ChildNodes;
 						foreach (XmlNode clueType in clueTypes)
@@ -165,7 +208,7 @@ public class XMLParser : MonoBehaviour {
 			}
 			puzzles.Add(_tempPuzzle);
 		}
-		//Debug.Log (puzzles.Count);
+		Debug.Log("XMLParser: BreakdownXML: " + puzzles.Count);
 
 		//just for testing
 		//GridManager.Instance.currentPuzzle = puzzles[0];

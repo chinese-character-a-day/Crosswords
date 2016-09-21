@@ -27,7 +27,7 @@ public class MagazineUnit : MonoBehaviour {
 
 	public void OnLoadMagazineContent()
 	{
-		//Debug.Log ("Loading [" + this.gameObject.name + "]");
+		Debug.Log ("MagazineUnit: Loading [" + this.gameObject.name + "]");
 		if (isStackElement)
 		{
 			PuzzleLibrary.Instance.OnLoadPuzzlesWithinMagazine(stackIndex, indexedWith);

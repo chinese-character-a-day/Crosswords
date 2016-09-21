@@ -27,17 +27,17 @@ public class InputKeyboardKey : MonoBehaviour {
 
 	public void OnKeyGetPressed()
 	{
-		//Debug.Log("first call");
+		Debug.Log("first call");
 		//StartCoroutine(OnKeyGetPressedSequence());
 		OnKeyGetPressedSequence();
 	}
 
 	public void OnKeyGetPressedSequence()
 	{
-		//Debug.Log("Input started");
+		Debug.Log("Input started");
 		if (!InputKeyboard.Instance.isInput)
 		{
-			//Debug.Log("Input PASSED");
+			Debug.Log("Input PASSED");
 			//LogManager.Instance.LogMessage ("<color=yellow>Pressed the virtual key </color> [" + keyValue + "]");
 
 			InputKeyboard.Instance.isInput = true;
